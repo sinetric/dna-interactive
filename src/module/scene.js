@@ -8,8 +8,11 @@ var camera = new THREE.PerspectiveCamera(75, window.innerWidth/innerHeight, 0.1,
 
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
-    antialias: true
+    antialias: true,
+    alpha: true
 })
+
+renderer.setClearColor(0xffffff, 1);
 
 // Torus
 
@@ -81,6 +84,8 @@ loader.load(
 	}
 );
 
+//scene.background = new THREE.Color(0x101016)
+
 //const SceneBackground = new THREE.TextureLoader().load('../../textures/background.png')
 //scene.background = SceneBackground
 
@@ -92,22 +97,22 @@ renderer.setSize(window.innerWidth, innerHeight);
 camera.position.setX(-3);
 camera.position.setZ(30);
 
-const Controls = new OrbitControls(camera, renderer.domElement)
+//const Controls = new OrbitControls(camera, renderer.domElement)
 
-function animate(){
+function animate() {
     requestAnimationFrame(animate)
 
     //DNA.rotation.y += 0.01;
     DNA.rotation.z += 0.005;
 
-    Controls.update()
+    //Controls.update()
 
     renderer.setClearColor( 0x000000, 0 ); // the default
 
     renderer.render(scene, camera)
 }
 
-animate()
+animate();
 
 export default class Scene {
     constructor(){
