@@ -1,8 +1,5 @@
-import "../../style.css";
 import * as THREE from "three";
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-import { lerp } from "three/src/math/MathUtils";
 import { clamp } from "../core/math_operations.js";
 
 const scene = new THREE.Scene
@@ -59,9 +56,61 @@ renderer.setClearColor(0xffffff, 1);
 
 var DNA;
 
-const plane_geometry = new THREE.PlaneGeometry(60, 60, 199, 199);
-const plane_material = new THREE.MeshStandardMaterial({ wireframe: true });
-const plane = new THREE.Mesh(plane_geometry, plane_material);
+
+
+for (let i = 2; i < 15; i++){
+    const sinValue = Math.sin(i * 24) * 2
+    const sphere_geometry1 = new THREE.SphereGeometry(2)
+    const sphere_material1 = new THREE.MeshStandardMaterial({ wireframe: true });
+    const sphere1 = new THREE.Mesh(sphere_geometry1, sphere_material1);
+    
+    const sphere_geometry2 = new THREE.SphereGeometry(2)
+    const sphere_material2 = new THREE.MeshStandardMaterial({ wireframe: true });
+    const sphere2 = new THREE.Mesh(sphere_geometry2, sphere_material2);
+
+    var isAT;
+
+    if(Math.floor(Math.random() * 2) == 1){
+        isAT = true;
+    }
+    
+    const cylinder_geometry1 = new THREE.CylinderGeometry(1, 1, 8.75)
+    const cylinder_material1 = new THREE.MeshStandardMaterial({wireframe: true});
+    const cylinder1 = new THREE.Mesh(cylinder_geometry1, cylinder_material1)
+    
+    const cylinder_geometry2 = new THREE.CylinderGeometry(1, 1, 8.75)
+    const cylinder_material2 = new THREE.MeshStandardMaterial({wireframe: true , color: (isAT && new THREE.Color("rgb(66, 245, 108)"))});
+    const cylinder2 = new THREE.Mesh(cylinder_geometry2, cylinder_material2)
+    
+    const group = new THREE.Group()
+    
+    sphere1.position.x = 8.75 - 1  + sinValue
+    sphere2.position.x = -11.25 - 1  - sinValue
+    cylinder1.position.x = -6.875 - sinValue
+    cylinder2.position.x = -6.875 + 8.75 + sinValue
+    
+    sphere1.position.z = 15,
+    sphere2.position.z = 15,
+    cylinder1.position.z = 15;
+    cylinder2.position.z = 15;
+    
+    cylinder1.rotation.x = 3.14/2;
+    cylinder1.rotation.z = 3.14/2;
+    cylinder2.rotation.x = 3.14/2;
+    cylinder2.rotation.z = 3.14/2;
+
+    sphere1.position.y = i * -4.5
+    sphere2.position.y = i * -4.5
+    cylinder1.position.y = i * -4.5
+    cylinder2.position.y = i * -4.5
+    
+    scene.add(sphere1)
+    scene.add(sphere2)
+    scene.add(cylinder1)
+    scene.add(cylinder2)
+    
+    //scene.add(group)
+}
 
 // Star Generation
 
