@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@300;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
@@ -12,16 +12,25 @@
     <canvas id="bg"></canvas>
 
     <div class="sections">
-      <div class="welcome">
-        <h1 id="title">DNA</h1>
-        <h2 id="description">Lorem ipsum dolor sit amet consectur</h2>
-      </div>
 
-      <div class="zafran">
-        <h1 id="title">adasdasdasd</h1>
-        <h2 id="description">Lorem ipsum dolor sit amet consectur</h2>
-      </div>
+      <section class="hidden">
+        <div class="welcome">
+          <h1 id="title">DNA</h1>
+          <h2 id="description">learn more with our interactive website</h2>
+        </div>
+      </section>
+
+      <section class="hidden">
+        <div class="body">
+          <h1 id="title_black">1. DNA structure</h1>
+          <h2 id="description_black"><b><font color="#4dab66">The structure of DNA is simple</font></b>, let's go over them.</h2>
+        </div>
+      </section>
+
     </div>
+
+    <p id="scrolling_end">Mr West</p>
+
     <script type="module" src="/main.js"></script>
   </body>
 </html>

@@ -2,9 +2,50 @@ import "../../style.css";
 import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { lerp } from "three/src/math/MathUtils";
+import { clamp } from "../core/math_operations.js";
 
 const scene = new THREE.Scene
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth/innerHeight, 0.1, 1000)
+
+var Background = new THREE.Color(0x101016);
+
+var FullBlackBackground = new THREE.Color("rgb(0, 0, 0)");
+var BlackBackground = new THREE.Color("rgb(15, 15, 15)");
+var WhiteBackground = new THREE.Color("rgb(255, 255, 255)");
+
+let currentCheckpoint = 1;
+let checkpointsAmount = 3;
+let currentActive = 1;
+let backgroundLerpAlpha = 0;
+let checkpoints = {
+    0: { // This checkpoint is numerically unreachable
+        Percentage: -1,
+        BackgroundColor: BlackBackground,
+        Active: true,
+    },
+    1: {
+        Percentage: 0,
+        BackgroundColor: BlackBackground,
+        Active: true,
+
+        FogDistance: 5,
+    },
+    2: {
+        Percentage: 1.4,
+        BackgroundColor: WhiteBackground,
+        Active: false,
+        
+        FogDistance: 90,
+    },
+    3: {
+        Percentage: 2,
+        BackgroundColor: BlackBackground,
+        Active: false,
+        
+        FogDistance: 90,
+    }
+}
 
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
@@ -21,6 +62,12 @@ var DNA;
 const plane_geometry = new THREE.PlaneGeometry(60, 60, 199, 199);
 const plane_material = new THREE.MeshStandardMaterial({ wireframe: true });
 const plane = new THREE.Mesh(plane_geometry, plane_material);
+
+// Star Generation
+
+function addStar(){
+    
+}
 
 /*
 
@@ -84,7 +131,7 @@ loader.load(
 	}
 );
 
-//scene.background = new THREE.Color(0x101016)
+scene.background = new THREE.Color(0x101016);
 
 //const SceneBackground = new THREE.TextureLoader().load('../../textures/background.png')
 //scene.background = SceneBackground
@@ -99,11 +146,52 @@ camera.position.setZ(30);
 
 //const Controls = new OrbitControls(camera, renderer.domElement)
 
+var startingPoint = 0;
+var endPoint = -28662.5;
+
+document.body.onscroll = function(){
+    const t = document.body.getBoundingClientRect().top;
+    const percentage = clamp(t/endPoint * 100, 0, 100);
+
+    console.log(percentage);
+
+    console.log(checkpoints)
+    
+    for (const [i, v] of Object.entries(checkpoints)) {
+        if(i != 0){
+            const next = (Number(i) + 1)
+            const previous = (Number(i))
+
+            //console.log(i, v, next, previous, checkpointsAmount)
+            //console.log(checkpoints[clamp(next, 0, checkpointsAmount)], clamp(next, 0, checkpointsAmount))
+            console.log(checkpoints[previous].Percentage, percentage, checkpoints[clamp(next, 0, checkpointsAmount)].Percentage)
+
+            if(checkpoints[previous].Percentage < percentage){
+                if(checkpoints[clamp(next, 0, checkpointsAmount)].Percentage > percentage){
+                    currentActive = i;
+
+                    console.log(i, "is now active")
+                }
+            }
+        }
+    }
+
+    camera.position.y = t * 0.005
+    DNA.position.x = 1 + t * -0.005
+}
+
 function animate() {
     requestAnimationFrame(animate)
 
     //DNA.rotation.y += 0.01;
-    DNA.rotation.z += 0.005;
+    if(DNA != null){
+        DNA.rotation.z += 0.005;
+    }
+
+    Background = Background.lerp(checkpoints[currentActive].BackgroundColor, 0.09);
+    scene.background = Background;
+    scene.fog.color = Background;
+    scene.fog.far = checkpoints[currentActive].FogDistance
 
     //Controls.update()
 
@@ -111,6 +199,8 @@ function animate() {
 
     renderer.render(scene, camera)
 }
+
+console.log(scene.fog)
 
 animate();
 
