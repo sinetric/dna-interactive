@@ -19,6 +19,25 @@ body {
   z-index: 2;
 }
 
+.tooltip {
+  box-shadow: 0px 0px 8px #2d2d2d;
+  position: fixed;
+  margin-top: 0%;
+  margin-left: 20%;
+  bottom: 70%;
+  right: 65%;
+  width: 25vw;
+  height: 25vh;
+  opacity: 100%;
+  background-color: rgb(240, 240, 240);
+  transition: transform 0s, opacity 0.1s ease-in; /* Sticking effect */
+  pointer-events: none; /* Allow clicking trough the div */
+  z-index: 3;
+}
+
+.fadeOut { opacity: 0; }
+.fadeIn { opacity: 1; }
+
 .body {
   position: sticky;
   margin-top: 60%;
@@ -69,6 +88,36 @@ body {
   z-index: 10;
 }
 
+#title_tooltip {
+  text-align: left;
+  text-shadow: 2px 2px 50px rgb(120, 124, 127) ;
+  font-family: 'Poppins', sans-serif;
+  font-weight: bolder;
+  font-style: italic;
+  stroke: black;
+  font-size: 70px;
+  margin-left: 5%;
+  margin-top: 0%;
+  color: rgb(0, 0, 0);
+
+  z-index: 10;
+}
+
+#description_tooltip {
+  text-align: left;
+  text-shadow: 2px 2px 10px rgb(225, 225, 226) ;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 100;
+  font-style: italic;
+  font-size: 20px;
+  top: 50%;
+  margin-left: 5%;
+  margin-top: -15%;
+  color: rgb(35, 35, 35);
+
+  z-index: 10;
+}
+
 #description {
   text-align: left;
   text-shadow: 2px 2px 10px rgb(121, 121, 121) ;
@@ -98,7 +147,20 @@ body {
   z-index: 10;
 }
 
+#description_small_black {
+  text-align: left;
+  text-shadow: 2px 2px 10px rgb(225, 225, 226) ;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 100;
+  font-style: italic;
+  font-size: 15px;
+  top: 50%;
+  margin-left: 11%;
+  margin-top: -20%;
+  color: rgb(35, 35, 35);
 
+  z-index: 10;
+}
 
 h1, h2, h3 {
   text-align: center;

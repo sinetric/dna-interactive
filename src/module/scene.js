@@ -3,7 +3,8 @@ import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { clamp } from "../core/math_operations.js";
 
 const scene = new THREE.Scene
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth/innerHeight, 0.1, 1000)
+const raycaster = new THREE.Raycaster();
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000)
 
 var Background = new THREE.Color(0x101016);
 
@@ -11,8 +12,27 @@ var FullBlackBackground = new THREE.Color("rgb(0, 0, 0)");
 var BlackBackground = new THREE.Color("rgb(15, 15, 15)");
 var WhiteBackground = new THREE.Color("rgb(255, 255, 255)");
 
+const information = {
+    "A_nucleotide": {
+        TitleInnerHTML: "A <font size=30px>Adenine</font>",
+        DescriptionInnerHTML: "Adenine nucleotide",
+    },
+    "T_nucleotide": {
+        TitleInnerHTML: "T <font size=30px>Thymine</font>",
+        DescriptionInnerHTML: "Thymine nucleotide",
+    },
+    "G_nucleotide": {
+        TitleInnerHTML: "G <font size=30px>Guanine</font>",
+        DescriptionInnerHTML: "Guanine nucleotide",
+    },
+    "C_nucleotide": {
+        TitleInnerHTML: "C <font size=30px>Cytosine</font>",
+        DescriptionInnerHTML: "Cytosine nucleotide",
+    },
+}
+
 let currentCheckpoint = 1;
-let checkpointsAmount = 3;
+let checkpointsAmount = 4;
 let currentActive = 1;
 let backgroundLerpAlpha = 0;
 let checkpoints = {
@@ -36,7 +56,14 @@ let checkpoints = {
         FogDistance: 90,
     },
     3: {
-        Percentage: 2,
+        Percentage: 44,
+        BackgroundColor: BlackBackground,
+        Active: false,
+        
+        FogDistance: 90,
+    },
+    4: {
+        Percentage: 60,
         BackgroundColor: BlackBackground,
         Active: false,
         
@@ -60,11 +87,11 @@ var DNA;
 
 for (let i = 2; i < 15; i++){
     const sinValue = Math.sin(i * 24) * 2
-    const sphere_geometry1 = new THREE.SphereGeometry(2)
+    const sphere_geometry1 = new THREE.OctahedronGeometry(2, 3)
     const sphere_material1 = new THREE.MeshStandardMaterial({ wireframe: true });
     const sphere1 = new THREE.Mesh(sphere_geometry1, sphere_material1);
     
-    const sphere_geometry2 = new THREE.SphereGeometry(2)
+    const sphere_geometry2 = new THREE.OctahedronGeometry(2, 3)
     const sphere_material2 = new THREE.MeshStandardMaterial({ wireframe: true });
     const sphere2 = new THREE.Mesh(sphere_geometry2, sphere_material2);
 
@@ -72,22 +99,41 @@ for (let i = 2; i < 15; i++){
 
     if(Math.floor(Math.random() * 2) == 1){
         isAT = true;
+    } else{
+        isAT = false;
     }
     
-    const cylinder_geometry1 = new THREE.CylinderGeometry(1, 1, 8.75)
-    const cylinder_material1 = new THREE.MeshStandardMaterial({wireframe: true});
-    const cylinder1 = new THREE.Mesh(cylinder_geometry1, cylinder_material1)
+    const cylinder_geometry1 = new THREE.CylinderGeometry(1, 1, 8.75 + sinValue)
+    var cylinder_material1;
     
-    const cylinder_geometry2 = new THREE.CylinderGeometry(1, 1, 8.75)
-    const cylinder_material2 = new THREE.MeshStandardMaterial({wireframe: true , color: (isAT && new THREE.Color("rgb(66, 245, 108)"))});
+    const cylinder_geometry2 = new THREE.CylinderGeometry(1, 1, 8.75 + sinValue)
+    var  cylinder_material2;
+
+    if (isAT == true){
+        cylinder_material1 = new THREE.MeshStandardMaterial({wireframe: true , color: new THREE.Color("rgb(245, 84, 66)")});
+        cylinder_material2 = new THREE.MeshStandardMaterial({wireframe: true , color: new THREE.Color("rgb(40, 93, 237)")});
+    } else{
+        cylinder_material1 = new THREE.MeshStandardMaterial({wireframe: true , color: new THREE.Color("rgb(66, 245, 108)")});
+        cylinder_material2 = new THREE.MeshStandardMaterial({wireframe: true , color: new THREE.Color("rgb(242, 218, 82)")});
+    }
+
+    const cylinder1 = new THREE.Mesh(cylinder_geometry1, cylinder_material1)
     const cylinder2 = new THREE.Mesh(cylinder_geometry2, cylinder_material2)
+
+    if (isAT == true){
+        cylinder1.name = "A_nucleotide";
+        cylinder2.name = "T_nucleotide";
+    } else{
+        cylinder1.name = "G_nucleotide";
+        cylinder2.name = "C_nucleotide";
+    }
     
     const group = new THREE.Group()
     
-    sphere1.position.x = 8.75 - 1  + sinValue
-    sphere2.position.x = -11.25 - 1  - sinValue
-    cylinder1.position.x = -6.875 - sinValue
-    cylinder2.position.x = -6.875 + 8.75 + sinValue
+    sphere1.position.x = 8.75 - 3  + sinValue
+    sphere2.position.x = -8.75 - 3 - sinValue
+    cylinder1.position.x = 8.75 - 3 - (8.75 - sinValue)/2
+    cylinder2.position.x = -8.75 - 3 + (8.75 - sinValue)/2
     
     sphere1.position.z = 15,
     sphere2.position.z = 15,
@@ -198,6 +244,20 @@ camera.position.setZ(30);
 var startingPoint = 0;
 var endPoint = -28662.5;
 
+const pointer = new THREE.Vector2();
+
+var CurrentHover;
+
+let EventListener = {
+    MouseMoveEvent: null,
+}
+
+const onMouseMove = (event) => {
+    EventListener.MouseMoveEvent = event
+} 
+
+window.addEventListener('mousemove', onMouseMove);
+
 document.body.onscroll = function(){
     const t = document.body.getBoundingClientRect().top;
     const percentage = clamp(t/endPoint * 100, 0, 100);
@@ -229,6 +289,9 @@ document.body.onscroll = function(){
     DNA.position.x = 1 + t * -0.005
 }
 
+document.getElementById('tooltip').style.transform = 'translateY('+(10000)+'px)';
+document.getElementById('tooltip').style.transform += 'translateX('+(10000)+'px)';
+
 function animate() {
     requestAnimationFrame(animate)
 
@@ -237,10 +300,49 @@ function animate() {
         DNA.rotation.z += 0.005;
     }
 
+    if(EventListener.MouseMoveEvent != null){
+        // calculate pointer position in normalized device coordinates
+        // (-1 to +1) for both components
+    
+        pointer.x = ( EventListener.MouseMoveEvent.clientX / window.innerWidth ) * 2 - 1;
+        pointer.y = - ( EventListener.MouseMoveEvent.clientY / window.innerHeight ) * 2 + 1;
+    
+        if(CurrentHover != null){
+            document.getElementById('tooltip').style.transform = 'translateY('+(EventListener.MouseMoveEvent.clientY-80)+'px)';
+            document.getElementById('tooltip').style.transform += 'translateX('+(EventListener.MouseMoveEvent.clientX-100)+'px)';         
+
+            document.getElementById('tooltip').classList.replace('fadeOut', 'fadeIn');
+    
+            document.getElementById('title_tooltip').innerHTML = CurrentHover.TitleInnerHTML;
+            document.getElementById('description_tooltip').innerHTML = CurrentHover.DescriptionInnerHTML;
+        }else{
+            //document.getElementById('tooltip').style.transform = 'translateY('+(10000)+'px)';
+            //document.getElementById('tooltip').style.transform += 'translateX('+(10000)+'px)';  
+
+            document.getElementById('tooltip').classList.replace('fadeIn', 'fadeOut');
+        }
+    }
+
     Background = Background.lerp(checkpoints[currentActive].BackgroundColor, 0.09);
     scene.background = Background;
     scene.fog.color = Background;
     scene.fog.far = checkpoints[currentActive].FogDistance
+
+	raycaster.setFromCamera( pointer, camera );
+    var intersects = raycaster.intersectObject(scene, true);
+
+    if (intersects.length > 0) {
+        var object = intersects[0].object;
+
+        //console.log(object.name)
+
+        if(information[object.name]){
+            CurrentHover = information[object.name];
+            //console.log(information[object.name], "object data")
+        }
+    } else{
+        CurrentHover = null;
+    }
 
     //Controls.update()
 
@@ -249,7 +351,7 @@ function animate() {
     renderer.render(scene, camera)
 }
 
-console.log(scene.fog)
+//console.log(scene.fog)
 
 animate();
 
